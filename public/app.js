@@ -9,13 +9,13 @@ const MACROS = [
 const GROUP_NICKS = {
   'GDR': 'Communiste', 'LFI-NFP': 'Insoumis', 'EcoS': 'Écologiste', 'SOC': 'Socialiste',
   'EPR': 'Macroniste', 'Dem': 'MoDem', 'HOR': 'Horizons', 'LIOT': 'Indépendant',
-  'DR': 'Républicain', 'UDR': 'Ciottiste', 'RN': 'Frontiste', 'NI': 'Non-inscrit',
+  'DR': 'Républicain', 'UDR': 'Ciottiste', 'RN': 'Frontiste',
 };
 
 const GROUP_COLORS = {
   'GDR': '#d12a2a', 'LFI-NFP': '#8b3fcf', 'EcoS': '#2da567', 'SOC': '#ff5d8f',
   'EPR': '#ffd23f', 'Dem': '#ff9a3c', 'HOR': '#5cc8f0', 'LIOT': '#4b3cd1',
-  'DR': '#1f3a6b', 'UDR': '#6b3f1f', 'RN': '#0a0a0a', 'NI': '#8a8a8a',
+  'DR': '#1f3a6b', 'UDR': '#6b3f1f', 'RN': '#0a0a0a',
 };
 
 // Groupes à fond clair → texte sombre
@@ -415,10 +415,9 @@ function nextDeputy() {
 function handlePick(abbr) {
   if (revealed) return;
 
-  let ok = false;
+  let ok;
   if (mode === 'easy') {
-    const macro = MACROS.find(m => m.id === abbr);
-    ok = macro ? macro.subs.includes(current.groupe) : abbr === current.groupe;
+    ok = MACROS.find(m => m.id === abbr).subs.includes(current.groupe);
   } else {
     ok = (abbr === current.groupe);
   }
