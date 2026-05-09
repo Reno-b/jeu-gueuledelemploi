@@ -66,6 +66,7 @@ body[data-bg="none"]::before { display: none; }
   margin: 0 auto;
   padding: 20px 28px 16px;
   height: 100dvh;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: var(--gap);
@@ -443,6 +444,8 @@ body[data-bg="none"]::before { display: none; }
   /* Gaps conservés. Tailles réduites, zone de jeu prioritaire */
   .app { padding: 12px 16px 12px; }
   .tagline { display: none; }
+  /* Titre : min réduit à 12px pour éviter le dépassement sur petits écrans (320px) */
+  .title-block h1 { font-size: clamp(12px, 4vw, 48px); }
   /* Badges cachés pour gagner de la place */
   .mode-btn .badge { display: none; }
   /* Passage en colonne unique, scroll vertical autorisé, horizontal interdit */
