@@ -1,0 +1,13 @@
+{
+  "name": "depute-quiz",
+  "version": "1.0.0",
+  "description": "Jeu - Reconnaître les députés de l'Assemblée Nationale",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node scripts/build-data.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

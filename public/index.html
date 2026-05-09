@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Gueule de l'Emploi ?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-bg="dots">
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="title-block">
+        <div class="title-row">
+          <h1>La Gueule de l'Emploi<span class="accent">?</span></h1>
+          <p class="tagline">Devine le bord politique de nos députés</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Chargement des 577 députés…</p>
+  </div>
+
+  <!-- ERROR -->
+  <div id="error" class="hidden">
+    <div class="error-box">
+      <p class="error-icon">⚠️</p>
+      <p id="error-msg">Erreur de chargement</p>
+      <button class="btn-retry" onclick="init()">Réessayer</button>
+    </div>
+  </div>
+
+  <!-- MAIN GAME -->
+  <div class="main hidden" id="game">
+
+    <!-- Colonne gauche : Deputy card -->
+    <div class="deputy-card" id="deputy-card">
+      <div class="photo-wrap">
+        <!-- Photo réelle (chargée via /api/photo/:id) -->
+        <img id="deputy-photo" class="deputy-photo" alt="Portrait" draggable="false">
+        <!-- Overlays décoratifs -->
+        <div class="scan-lines"></div>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <!-- Banner post-révélation -->
+        <div class="reveal-banner hidden" id="reveal-banner">
+          <div class="reveal-name" id="reveal-name"></div>
+          <div class="reveal-group" id="reveal-group"></div>
+        </div>
+      </div>
+      <!-- Meta chips (post-révélation) -->
+      <div class="deputy-meta hidden" id="deputy-meta">
+        <div class="meta-chip">Circonscription<strong id="meta-circo">—</strong></div>
+        <div class="meta-chip">Département<strong id="meta-dept">—</strong></div>
+        <div class="meta-chip">Profession<strong id="meta-prof">—</strong></div>
+        <div class="meta-chip">Région<strong id="meta-region">—</strong></div>
+      </div>
+    </div>
+
+    <!-- Colonne droite : Hémicycle -->
+    <div class="right-col">
+      <div class="panel">
+        <h3 class="panel-title" id="panel-title">
+          <span class="num-tag" id="panel-tag">?</span>
+          <span id="panel-text">Quel est le groupe parlementaire ?</span>
+        </h3>
+
+        <div class="hemicycle-wrap" id="hemicycle-container">
+          <svg viewBox="0 0 400 200" id="hemicycle-svg" role="img" aria-label="Hémicycle interactif"></svg>
+            <div class="hover-hint" id="hover-hint">Survole une famille pour voir les groupes</div>
+        </div>
+
+        <button class="next-btn hidden" id="next-btn">Suivant →</button>
+      </div>
+
+      <!-- Panneau bas : stats + modes -->
+      <div class="controls-panel">
+        <div class="stats">
+          <div class="stat-card" data-tone="good">
+            <div class="stat-top"><span>Bonnes</span><span class="icon">✓</span></div>
+            <div class="num" id="score-good">0</div>
+          </div>
+          <div class="stat-card" data-tone="bad">
+            <div class="stat-top"><span>Mauvaises</span><span class="icon">✗</span></div>
+            <div class="num" id="score-bad">0</div>
+          </div>
+          <div class="stat-card" data-tone="streak">
+            <div class="stat-top"><span>Série</span><span class="icon">★</span></div>
+            <div class="num" id="score-streak">0</div>
+          </div>
+          <div class="stat-card" data-tone="record">
+            <div class="stat-top"><span>Record</span><span class="icon">♦</span></div>
+            <div class="num" id="score-record">0</div>
+          </div>
+        </div>
+        <div class="modes">
+          <span class="mode-label">Mode de jeu :</span>
+          <button class="mode-btn active" id="btn-normal">🏛 Normal <span class="badge">12 GROUPES</span></button>
+          <button class="mode-btn" id="btn-easy">🎯 Facile <span class="badge">3 CHOIX</span></button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+
+</div><!-- /app -->
+
+<footer class="footer">
+  <p>Données : <a href="https://data.assemblee-nationale.fr" target="_blank" rel="noopener">data.assemblee-nationale.fr</a></p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
