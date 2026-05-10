@@ -183,10 +183,10 @@ function setupEvents() {
     if (!isTouch && !revealed) { clearTimeout(macroLeaveTimer); setActiveMacro(null); }
   });
 
-  // Mobile : tap en dehors de l'hémicycle = refermer l'expansion
+  // Mobile : tap en dehors du SVG hémicycle = refermer l'expansion
   document.addEventListener('touchstart', e => {
     if (!isTouch || !activeMacro || revealed) return;
-    if (!$('hemicycle-container').contains(e.target)) setActiveMacro(null);
+    if (!$('hemicycle-svg').contains(e.target)) setActiveMacro(null);
   }, { passive: true });
 
   // Pause auto-avance quand la souris/doigt est sur la photo
@@ -210,6 +210,29 @@ function setupEvents() {
       nextDeputy();
     }
   });
+
+  setupStatsTrigger();
+}
+
+function setupStatsTrigger() {
+  const trigger  = $('stats-trigger');
+  const backdrop = $('stats-backdrop');
+  const closeBtn = $('stats-close-btn');
+  const panel    = document.querySelector('.controls-panel');
+  if (!trigger || !panel) return;
+
+  function openStats() {
+    panel.classList.add('stats-open');
+    if (backdrop) backdrop.classList.add('visible');
+  }
+  function closeStats() {
+    panel.classList.remove('stats-open');
+    if (backdrop) backdrop.classList.remove('visible');
+  }
+
+  trigger.addEventListener('click', openStats);
+  if (backdrop) backdrop.addEventListener('click', closeStats);
+  if (closeBtn) closeBtn.addEventListener('click', closeStats);
 }
 
 /* ── Hémicycle animation ──────────────────────────────────────────────────── */
@@ -661,8 +684,9 @@ function updateScore(ok, pts) {
   $('score-bad').textContent          = score.bad;
   $('score-streak').textContent       = score.streak;
   $('score-record').textContent       = score.record;
-  $('score-points').textContent       = score.points;
+  $('score-points').textContent        = score.points;
   $('score-points-record').textContent = score.pointsRecord;
+  const tp = $('trigger-points'); if (tp) tp.textContent = score.points;
 
   bumpScore(pts);
   if (ok) {
@@ -697,6 +721,7 @@ function setMode(m) {
   $('score-record').textContent        = score.record;
   $('score-points').textContent        = 0;
   $('score-points-record').textContent = score.pointsRecord;
+  const tp2 = $('trigger-points'); if (tp2) tp2.textContent = 0;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   $(`btn-${m}`).classList.add('active');
   drawHemicycle();

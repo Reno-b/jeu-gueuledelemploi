@@ -86,6 +86,7 @@
 
       <!-- Panneau bas : stats + modes -->
       <div class="controls-panel">
+        <button class="stats-close-btn" id="stats-close-btn" aria-label="Fermer">✕</button>
         <h3 class="section-title">Score :</h3>
         <div class="stats">
           <div class="stat-card" data-tone="score-pts">
@@ -122,9 +123,21 @@
           <button class="mode-btn" id="btn-easy">🎯 Facile <span class="badge">3 CHOIX</span></button>
         </div>
       </div>
+
+      <!-- Mobile uniquement : barre Points qui ouvre le panneau stats -->
+      <button class="stats-trigger" id="stats-trigger">
+        <span class="trigger-pts">
+          <span class="trigger-icon">▲</span>
+          <span class="trigger-label">Points</span>
+          <strong class="trigger-num" id="trigger-points">0</strong>
+        </span>
+        <span class="trigger-hint">Voir les stats ↑</span>
+      </button>
     </div>
 
   </div><!-- /main -->
+
+  <div class="stats-backdrop" id="stats-backdrop"></div>
 
 
 </div><!-- /app -->
