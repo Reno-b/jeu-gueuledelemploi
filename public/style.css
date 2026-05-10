@@ -388,17 +388,21 @@ body::before {
 .corner.br { bottom: 8px; right: 8px; border-left: 0; border-top: 0; }
 
 
+.reveal-stack {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  z-index: 20;
+  display: flex; flex-direction: column;
+}
+
 .reveal-banner {
-  position: absolute; left: 12px; right: 12px; bottom: 12px;
   border: var(--border-thick); box-shadow: var(--shadow-sm);
   background: var(--paper);
   padding: 8px 10px;
   display: flex; flex-direction: column; gap: 4px;
-  animation: reveal 0.35s ease-out;
-  z-index: 35;
+  animation: reveal 0.35s both ease-out;
 }
 @keyframes reveal {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .reveal-banner[data-tone="correct"] { background: var(--green); }
@@ -416,8 +420,10 @@ body::before {
 
 .deputy-meta {
   display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  flex-shrink: 0;
-  animation: reveal 0.45s 0.1s both ease-out;
+  background: var(--paper);
+  border-top: var(--border-thick);
+  padding: 8px 10px;
+  animation: reveal 0.35s both ease-out;
 }
 .meta-chip {
   background: var(--paper-2);
@@ -588,20 +594,10 @@ body::before {
   .trigger-hint { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; white-space: nowrap; }
   /* Stats en grille 2×2 dans la feuille */
   .stats { display: grid; grid-template-columns: 1fr 1fr; }
-  /* Meta chips en overlay en bas de la photo */
-  .deputy-meta {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    z-index: 10; background: var(--paper);
-    padding: 6px 8px; gap: 6px;
-    border-top: var(--border-thick);
-    animation: reveal 0.35s 0.1s both ease-out;
-  }
+  /* Meta chips : padding et gap réduits sur mobile */
+  .deputy-meta { padding: 6px 8px; gap: 6px; }
   .meta-chip { background: var(--paper-2); border-color: var(--ink); color: var(--ink); padding: 4px 6px; font-size: 10px; }
   .meta-chip strong { color: var(--ink); font-size: 11px; margin-top: 2px; }
-}
-@media (max-width: 860px) {
-  /* Reveal-banner en haut pour éviter le chevauchement avec l'encart meta en bas */
-  .reveal-banner { bottom: unset; top: 12px; }
 }
 @media (max-width: 480px) {
   .app { padding: 10px 12px; }

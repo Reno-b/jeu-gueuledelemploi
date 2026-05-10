@@ -51,21 +51,23 @@
           <div class="scan-lines"></div>
           <div class="corner tl"></div><div class="corner tr"></div>
           <div class="corner bl"></div><div class="corner br"></div>
-          <div class="reveal-banner hidden" id="reveal-banner">
-            <div class="reveal-name" id="reveal-name"></div>
-            <div class="reveal-group" id="reveal-group"></div>
-          </div>
           <!-- Effect overlay inside photo-wrap: stamp centered on photo, stars can overflow -->
           <div class="effect-layer" id="effect-layer">
             <div class="effect-stamp" id="effect-stamp"></div>
           </div>
         </div>
-        <!-- Meta chips (post-révélation) -->
-        <div class="deputy-meta hidden" id="deputy-meta">
-          <div class="meta-chip">Circonscription<strong id="meta-circo">—</strong></div>
-          <div class="meta-chip">Département<strong id="meta-dept">—</strong></div>
-          <div class="meta-chip">Profession<strong id="meta-prof">—</strong></div>
-          <div class="meta-chip">Région<strong id="meta-region">—</strong></div>
+        <!-- Révélation : superposé sur tout le cadre, largeur = cadre -->
+        <div class="reveal-stack">
+          <div class="reveal-banner hidden" id="reveal-banner">
+            <div class="reveal-name" id="reveal-name"></div>
+            <div class="reveal-group" id="reveal-group"></div>
+          </div>
+          <div class="deputy-meta hidden" id="deputy-meta">
+            <div class="meta-chip">Circonscription<strong id="meta-circo">—</strong></div>
+            <div class="meta-chip">Département<strong id="meta-dept">—</strong></div>
+            <div class="meta-chip">Profession<strong id="meta-prof">—</strong></div>
+            <div class="meta-chip">Région<strong id="meta-region">—</strong></div>
+          </div>
         </div>
       </div>
     </div>
