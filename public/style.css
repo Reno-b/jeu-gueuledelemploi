@@ -368,6 +368,7 @@ body::before {
   padding: 8px 10px;
   display: flex; flex-direction: column; gap: 4px;
   animation: reveal 0.35s ease-out;
+  z-index: 35;
 }
 @keyframes reveal {
   from { opacity: 0; transform: translateY(8px); }
