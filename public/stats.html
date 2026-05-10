@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ma Collection — La Gueule de l'Emploi ?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="stats.css">
+</head>
+<body data-bg="dots" class="stats-body">
+<div class="app stats-app">
+
+  <!-- HEADER -->
+  <header class="header stats-header">
+    <div class="header-left">
+      <div class="title-block">
+        <div class="title-row">
+          <h1>MA <span class="accent">COLLECTION</span></h1>
+          <p class="tagline">Tous·tes les député·e·s que tu as croisé·e·s</p>
+        </div>
+      </div>
+    </div>
+    <a href="index.html" class="back-link" aria-label="Retour au jeu">
+      <span class="back-arrow">←</span>
+      <span>Jouer</span>
+    </a>
+  </header>
+
+  <!-- LOADING -->
+  <div id="loading" class="stats-loading">
+    <div class="spinner"></div>
+    <p>Chargement de ta collection…</p>
+  </div>
+
+  <!-- ERROR -->
+  <div id="error" class="hidden">
+    <div class="error-box">
+      <p class="error-icon">⚠️</p>
+      <p id="error-msg">Erreur de chargement</p>
+      <button class="btn-retry" onclick="initStats()">Réessayer</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="stats-content" class="hidden">
+
+    <!-- 1 — Stats globales (4 blocs) -->
+    <section class="global-stats">
+      <div class="stat-card big" data-tone="discovery">
+        <div class="stat-top"><span>Découvert·e·s</span><span class="icon">⚑</span></div>
+        <div class="num"><span id="g-discovered">—</span><span class="num-sep">/</span><span id="g-total" class="num-total">—</span></div>
+        <div class="progress"><div class="progress-fill" id="g-progress" style="width:0%"></div></div>
+      </div>
+      <div class="stat-card big" data-tone="accuracy">
+        <div class="stat-top"><span>Précision</span><span class="icon">%</span></div>
+        <div class="num" id="g-accuracy">—</div>
+        <div class="stat-sub"><span id="g-accuracy-sub">aucune partie jouée</span></div>
+      </div>
+      <div class="stat-card big nemesis" data-tone="nemesis">
+        <div class="stat-top"><span>Nemesis</span><span class="icon">☠</span></div>
+        <div class="nemesis-row" id="g-nemesis">
+          <div class="nemesis-photo placeholder">?</div>
+          <div class="nemesis-meta">
+            <div class="nemesis-name">—</div>
+            <div class="nemesis-rate">min. 3 rencontres</div>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card big" data-tone="confusion">
+        <div class="stat-top"><span>Confusion principale</span><span class="icon">↯</span></div>
+        <div class="confusion-line" id="g-confusion">
+          <span class="conf-empty">—</span>
+        </div>
+      </div>
+      <div class="stat-card big" data-tone="best-group">
+        <div class="stat-top"><span>Parti le mieux trouvé</span><span class="icon">✓</span></div>
+        <div class="group-acc" id="g-best-group">
+          <span class="conf-empty">—</span>
+        </div>
+      </div>
+      <div class="stat-card big" data-tone="worst-group">
+        <div class="stat-top"><span>Parti le moins bien trouvé</span><span class="icon">✗</span></div>
+        <div class="group-acc" id="g-worst-group">
+          <span class="conf-empty">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 — Filtres / Tri -->
+    <section class="filters-bar">
+      <div class="filter-row group-row" role="tablist" aria-label="Filtre par groupe">
+        <div class="filter-label">Groupe</div>
+        <div class="filter-scroll" id="group-filters">
+          <!-- buttons injected by JS -->
+        </div>
+      </div>
+      <div class="filter-row sort-row">
+        <div class="filter-label">Tri</div>
+        <div class="sort-buttons" id="sort-buttons" role="tablist" aria-label="Trier par">
+          <button class="sort-btn" data-sort="group">Groupe</button>
+          <button class="sort-btn" data-sort="name">A → Z</button>
+          <button class="sort-btn" data-sort="difficulty">Plus raté·e·s</button>
+          <button class="sort-btn active" data-sort="recent">Obtenues</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — Grid -->
+    <section class="collection-grid" id="collection-grid" aria-label="Collection des députés">
+      <!-- cards injected by JS -->
+    </section>
+
+    <p class="footnote">
+      <span class="dot"></span>
+      Clique sur une carte pour la retourner.
+      Les silhouettes sont les député·e·s que tu n'as pas encore vu·e·s.
+    </p>
+
+  </div>
+
+</div>
+
+<div id="card-modal-backdrop" class="card-modal-backdrop"></div>
+<div id="card-modal" class="card-modal" aria-modal="true" role="dialog" aria-label="Fiche du député"></div>
+
+<script src="stats.js"></script>
+</body>
+</html>

@@ -108,16 +108,30 @@ function getMobileAnchor() {
   return t && getComputedStyle(t).display !== 'none' ? t : null;
 }
 
-function bumpScore(pts) {
+const randomRot = () => (Math.random() * 12 - 6).toFixed(1) + 'deg';
+
+function spawnBump(anchor, text, color) {
   const el = document.createElement('span');
   el.className = 'score-bump';
-  el.textContent = pts > 0 ? `+${pts}` : `${pts}`;
-  el.style.color = pts > 0 ? 'var(--green)' : 'var(--pink)';
-  el.style.setProperty('--bump-rot', pts > 0 ? '-6deg' : '6deg');
-  const anchor = getMobileAnchor() || document.querySelector('.stat-card[data-tone="score-pts"]');
-  if (!anchor) return;
+  el.textContent = text;
+  el.style.color = color;
+  el.style.setProperty('--bump-rot', randomRot());
   anchor.appendChild(el);
   el.addEventListener('animationend', () => el.remove());
+}
+
+function bumpScore(pts) {
+  const anchor = getMobileAnchor() || document.querySelector('.stat-card[data-tone="score-pts"]');
+  if (!anchor) return;
+  const color = pts > 0 ? 'var(--green)' : 'var(--pink)';
+  const text  = pts > 0 ? `+${pts}` : `${pts}`;
+  setTimeout(() => spawnBump(anchor, text, color), Math.random() * 80 | 0);
+}
+
+function bumpCollection() {
+  const btn = document.querySelector('.btn-collection');
+  if (!btn) return;
+  setTimeout(() => spawnBump(btn, '+1', 'var(--green)'), 180);
 }
 
 // Détection touch (hover: none = pas de hover natif)
@@ -593,6 +607,8 @@ function handlePick(abbr) {
   answerState = ok ? 'correct' : 'wrong';
   revealed    = true;
 
+  if (mode === 'normal') trackPick(current.id, abbr, ok);
+
   if (ok) triggerCorrectEffect();
   else    triggerWrongEffect();
 
@@ -622,7 +638,7 @@ function handlePick(abbr) {
 function revealCard() {
   // Panel title
   $('panel-tag').textContent = answerState === 'correct' ? '✓' : '✗';
-  $('panel-text').textContent = answerState === 'correct' ? 'Bien joué !' : 'Raté…';
+  $('panel-text').textContent = answerState === 'correct' ? 'Bien joué·e !' : 'Raté·e…';
 
   // Reveal banner
   const banner = $('reveal-banner');
@@ -653,16 +669,10 @@ function revealCard() {
 function bumpStat(tone, text = '+1') {
   if (getMobileAnchor()) return; // sur mobile, seul bumpScore apparaît sur le trigger
   const colors = { good: 'var(--green)', bad: 'var(--pink)', streak: 'var(--orange)', record: 'var(--violet)', 'score-rec': 'var(--yellow)' };
-  const rots   = { good: '-8deg', bad: '6deg', streak: '-4deg', record: '9deg', 'score-rec': '-5deg' };
   const card = document.querySelector(`.stat-card[data-tone="${tone}"]`);
   if (!card) return;
-  const el = document.createElement('span');
-  el.className = 'score-bump';
-  el.textContent = text;
-  el.style.color = colors[tone] || 'var(--ink)';
-  el.style.setProperty('--bump-rot', rots[tone] || '-6deg');
-  card.appendChild(el);
-  el.addEventListener('animationend', () => el.remove());
+  const color = colors[tone] || 'var(--ink)';
+  setTimeout(() => spawnBump(card, text, color), Math.random() * 80 | 0);
 }
 
 function updateScore(ok, pts) {
@@ -731,6 +741,21 @@ function setMode(m) {
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   $(`btn-${m}`).classList.add('active');
   drawHemicycle();
+}
+
+/* ── Tracking collection ──────────────────────────────────────────────────── */
+function trackPick(deputyId, pickedGroup, isCorrect) {
+  let data;
+  try { data = JSON.parse(localStorage.getItem('deputy_picks') || '{}'); }
+  catch (_) { data = {}; }
+  const entry = data[deputyId] || { encounters: 0, correct: 0, firstSeen: Date.now(), picks: {} };
+  const isFirstWin = isCorrect && entry.correct === 0;
+  entry.encounters++;
+  if (isCorrect) entry.correct++;
+  if (pickedGroup) entry.picks[pickedGroup] = (entry.picks[pickedGroup] || 0) + 1;
+  data[deputyId] = entry;
+  localStorage.setItem('deputy_picks', JSON.stringify(data));
+  if (isFirstWin) bumpCollection();
 }
 
 /* ── Démarrage ────────────────────────────────────────────────────────────── */
