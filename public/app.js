@@ -129,7 +129,8 @@ function bumpScore(pts) {
 }
 
 function bumpCollection() {
-  const btn = document.querySelector('.btn-collection');
+  const btns = document.querySelectorAll('.btn-collection');
+  const btn = Array.from(btns).find(el => el.offsetParent !== null) || btns[0];
   if (!btn) return;
   setTimeout(() => spawnBump(btn, '+1', 'var(--green)'), 180);
 }

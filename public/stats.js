@@ -377,8 +377,8 @@ function cardHtml(d) {
           <div class="card-face card-front">
             <div class="card-photo-wrap">
               <svg class="silhouette" viewBox="0 0 60 80" fill="currentColor" aria-hidden="true">
-                <circle cx="30" cy="22" r="12"/>
-                <path d="M5 80 C 5 40, 55 40, 55 80 Z"/>
+                <circle cx="30" cy="26" r="12"/>
+                <path d="M5 80 C 5 27, 55 27, 55 80 Z"/>
               </svg>
               <div class="question-mark">?</div>
               <div class="bracket tl"></div><div class="bracket tr"></div>

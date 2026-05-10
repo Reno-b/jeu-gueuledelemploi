@@ -883,23 +883,28 @@ img.nemesis-photo { padding: 0; }
  * et rendrait backface-visibility: hidden inopérant.
  */
 .card-modal {
-  display: none;
+  display: block;
+  visibility: hidden;
+  pointer-events: none;
   position: fixed;
   top: 50%;
   left: 50%;
   width: min(320px, 80vw);
   aspect-ratio: 2 / 3;
+  -webkit-perspective: 1200px;
   perspective: 1200px;
   z-index: 101;
   transform: translate(-50%, -50%);
 }
 .card-modal.active,
-.card-modal.closing { display: block; }
+.card-modal.closing { visibility: visible; pointer-events: auto; }
 
 .card-modal-inner {
   position: absolute;
   inset: 0;
+  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
+  will-change: transform;
   /* transform géré exclusivement par les animations ci-dessous */
 }
 
