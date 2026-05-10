@@ -67,6 +67,7 @@ function svgText(parent, x, y, text, opts = {}) {
 
 /* ── État ─────────────────────────────────────────────────────────────────── */
 let deputies = [], groups = {}, current = null;
+let nextShadow = null;
 let mode = 'normal';
 let picked = null;
 let revealed = false;
@@ -86,6 +87,7 @@ let activeMacro = null;
 let animProgress = 0;
 let animStart = null;
 let animRAF = null;
+let macroLeaveTimer = null;
 const ANIM_DUR = prefersReducedMotion ? 0 : 280;
 
 const $ = id => document.getElementById(id);
@@ -117,10 +119,12 @@ async function init() {
 
     // Event listeners
     setupEvents();
+    initEffectStars();
+    setAccentColor();
 
     $('loading').classList.add('hidden');
     $('game').classList.remove('hidden');
-    nextDeputy();
+    applyNextDeputy(null); // first load: no swipe animation, shadow pre-loaded inside
 
   } catch (e) {
     $('loading').classList.add('hidden');
@@ -135,13 +139,16 @@ function setupEvents() {
   $('btn-normal').addEventListener('click', () => setMode('normal'));
   $('btn-easy').addEventListener('click',   () => setMode('easy'));
 
-  // Next button
-  $('next-btn').addEventListener('click', nextDeputy);
-
-  // Mouse leave hemicycle
+  // Mouse leave hemicycle (fallback : sortie complète du cadre)
   $('hemicycle-container').addEventListener('mouseleave', () => {
-    if (!isTouch && !revealed) setActiveMacro(null);
+    if (!isTouch && !revealed) { clearTimeout(macroLeaveTimer); setActiveMacro(null); }
   });
+
+  // Mobile : tap en dehors de l'hémicycle = refermer l'expansion
+  document.addEventListener('touchstart', e => {
+    if (!isTouch || !activeMacro || revealed) return;
+    if (!$('hemicycle-container').contains(e.target)) setActiveMacro(null);
+  }, { passive: true });
 
   // Pause auto-avance quand la souris/doigt est sur la photo
   $('deputy-card').addEventListener('mouseenter', () => {
@@ -349,8 +356,14 @@ function drawHemicycle() {
           else setActiveMacro(null);
         });
       } else {
-        // Desktop : hover pour expanser
-        g.addEventListener('mouseenter', () => setActiveMacro(m.id));
+        // Desktop : hover pour expanser, quitte le secteur = refermer
+        g.addEventListener('mouseenter', () => {
+          clearTimeout(macroLeaveTimer);
+          setActiveMacro(m.id);
+        });
+        g.addEventListener('mouseleave', () => {
+          macroLeaveTimer = setTimeout(() => setActiveMacro(null), 150);
+        });
       }
     }
 
@@ -369,6 +382,36 @@ function updateHint() {
   }
 }
 
+/* ── Effect stars init ────────────────────────────────────────────────────── */
+function setAccentColor() {
+  const groups = Object.keys(GROUP_COLORS);
+  const group  = groups[Math.floor(Math.random() * groups.length)];
+  const color  = GROUP_COLORS[group];
+  const accent = document.querySelector('.site-title .accent');
+  if (!accent) return;
+  accent.style.background = color;
+  accent.style.color = LIGHT_FILLS.has(group) ? 'var(--ink)' : 'var(--paper)';
+}
+
+function initEffectStars() {
+  const layer = $('effect-layer');
+  const N = 14;
+  for (let i = 0; i < N; i++) {
+    const angle = (i / N) * 360;
+    const dist = 90 + Math.random() * 80;
+    const dx = Math.round(Math.cos(angle * Math.PI / 180) * dist);
+    const dy = Math.round(Math.sin(angle * Math.PI / 180) * dist);
+    const rot = Math.round(Math.random() * 60 - 30);
+    const size = 22 + Math.round(Math.random() * 16);
+    const delay = (Math.random() * 0.07).toFixed(2);
+    const el = document.createElement('span');
+    el.className = 'effect-star';
+    el.textContent = '★';
+    el.style.cssText = `font-size:${size}px;--dx:${dx}px;--dy:${dy}px;--rot:${rot}deg;animation-delay:${delay}s`;
+    layer.appendChild(el);
+  }
+}
+
 /* ── Game flow ────────────────────────────────────────────────────────────── */
 function pickDeputy() {
   if (seen.size >= deputies.length) seen.clear();
@@ -381,39 +424,84 @@ function pickDeputy() {
   return d;
 }
 
-function nextDeputy() {
-  clearTimeout(autoTimer);
+function preloadNextShadow() {
+  nextShadow = pickDeputy();
+  $('shadow-photo').src = `https://www2.assemblee-nationale.fr/static/tribun/17/photos/${nextShadow.id}.jpg`;
+}
 
-  current     = pickDeputy();
+function applyNextDeputy(deputy) {
+  current     = deputy || pickDeputy();
   picked      = null;
   revealed    = false;
   answerState = 'idle';
 
-  // Reset animation
-  activeMacro   = null;
-  animProgress  = 0;
+  activeMacro  = null;
+  animProgress = 0;
   if (animRAF) cancelAnimationFrame(animRAF);
 
-  // Reset UI
   $('panel-tag').textContent  = '?';
-  $('panel-text').textContent = 'Quelle est sa couleur politique ?';
+  $('panel-text').textContent = mode === 'easy' ? 'Quel est son bord politique ?' : 'Quel est son parti politique ?';
   $('reveal-banner').classList.add('hidden');
   $('deputy-meta').classList.add('hidden');
-  $('next-btn').classList.add('hidden');
 
-  // Photo
   const img = $('deputy-photo');
-  img.style.opacity = '0';
-  img.src = '';
-  img.src = `https://www2.assemblee-nationale.fr/static/tribun/17/photos/${current.id}.jpg`;
+  const newSrc = `https://www2.assemblee-nationale.fr/static/tribun/17/photos/${current.id}.jpg`;
   img.onload  = () => { img.style.opacity = '1'; };
   img.onerror = () => { img.style.opacity = '0'; };
+  img.src = newSrc;
+  img.style.opacity = img.complete ? '1' : '0';
 
   drawHemicycle();
+  preloadNextShadow(); // pre-load next deputy's photo into shadow card
+}
+
+function nextDeputy() {
+  clearTimeout(autoTimer);
+
+
+  if (prefersReducedMotion) {
+    applyNextDeputy(nextShadow);
+    return;
+  }
+
+  const card = $('deputy-card');
+  card.classList.add('swiping-out');
+
+  setTimeout(() => {
+    const deputy = nextShadow; // already visible in shadow card
+    card.style.transition = 'none';
+    card.classList.remove('swiping-out');
+    void card.offsetWidth;
+    card.style.transition = '';
+    applyNextDeputy(deputy);
+  }, 250);
+}
+
+function triggerCorrectEffect() {
+  if (prefersReducedMotion) return;
+  const stamp = $('effect-stamp');
+  const layer = $('effect-layer');
+  stamp.textContent = '✓';
+  stamp.className = 'effect-stamp correct';
+  layer.classList.remove('effect-correct', 'effect-wrong');
+  void layer.offsetWidth;
+  layer.classList.add('effect-correct');
+}
+
+function triggerWrongEffect() {
+  if (prefersReducedMotion) return;
+  const stamp = $('effect-stamp');
+  const layer = $('effect-layer');
+  stamp.textContent = '✗';
+  stamp.className = 'effect-stamp wrong';
+  layer.classList.remove('effect-correct', 'effect-wrong');
+  void layer.offsetWidth;
+  layer.classList.add('effect-wrong');
 }
 
 function handlePick(abbr) {
   if (revealed) return;
+
 
   let ok;
   if (mode === 'easy') {
@@ -425,6 +513,9 @@ function handlePick(abbr) {
   picked      = abbr;
   answerState = ok ? 'correct' : 'wrong';
   revealed    = true;
+
+  if (ok) triggerCorrectEffect();
+  else    triggerWrongEffect();
 
   updateScore(ok);
 
@@ -471,12 +562,25 @@ function revealCard() {
   $('meta-prof').textContent    = current.profession || '—';
   $('meta-region').textContent  = current.region   || '—';
 
-  // Bouton suivant
-  $('next-btn').classList.remove('hidden');
 }
 
 /* ── Score ────────────────────────────────────────────────────────────────── */
+function bumpStat(tone) {
+  const colors = { good: 'var(--green)', bad: 'var(--pink)', streak: 'var(--orange)', record: 'var(--violet)' };
+  const rots   = { good: '-8deg', bad: '6deg', streak: '-4deg', record: '9deg' };
+  const card = document.querySelector(`.stat-card[data-tone="${tone}"]`);
+  if (!card) return;
+  const el = document.createElement('span');
+  el.className = 'score-bump';
+  el.textContent = '+1';
+  el.style.color = colors[tone] || 'var(--ink)';
+  el.style.setProperty('--bump-rot', rots[tone] || '-6deg');
+  card.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
 function updateScore(ok) {
+  const wasRecord = score.record;
   if (ok) {
     score.good++;
     score.streak++;
@@ -494,7 +598,15 @@ function updateScore(ok) {
   $('score-streak').textContent = score.streak;
   $('score-record').textContent = score.record;
 
-  // Animation stat card
+  if (ok) {
+    bumpStat('good');
+    bumpStat('streak');
+    if (score.record > wasRecord) bumpStat('record');
+  } else {
+    bumpStat('bad');
+  }
+
+  // Animation stat card série
   if (ok && score.streak > 1) {
     const c = document.querySelector('.stat-card[data-tone="streak"]');
     c.style.transform = 'translate(-4px, -4px)';
@@ -506,9 +618,12 @@ function updateScore(ok) {
 function setMode(m) {
   if (mode === m) return;
   mode = m;
-  // Reset série et charger le record du nouveau mode
+  score.good   = 0;
+  score.bad    = 0;
   score.streak = 0;
   score.record = parseInt(localStorage.getItem(recordKey(m)) || '0', 10);
+  $('score-good').textContent   = 0;
+  $('score-bad').textContent    = 0;
   $('score-streak').textContent = 0;
   $('score-record').textContent = score.record;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
