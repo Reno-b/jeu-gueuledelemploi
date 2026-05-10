@@ -511,13 +511,13 @@ body::before {
   /* Colonne unique, pas de scroll */
   .main { grid-template-columns: 1fr; grid-template-rows: auto; overflow-x: hidden; overflow-y: hidden; height: auto; }
   /* Carte : hauteur adaptée (panneau stats hors du flux normal) */
-  .card-stack { height: max(150px, calc(100dvh - 420px)); }
+  .card-stack { height: clamp(150px, calc(100dvh - 420px), 45vh); }
   .shadow-photo-wrap { flex: 1; min-height: 0; width: auto; aspect-ratio: 3/4; align-self: center; max-width: 100%; margin: 0; }
   .deputy-card { height: 100%; overflow: hidden; }
   .photo-wrap { flex: 1; min-height: 0; width: auto; aspect-ratio: 3/4; align-self: center; max-width: 100%; margin: 0; }
   .right-col { height: auto; overflow: visible; }
   .panel { height: auto; flex: none; }
-  .hemicycle-wrap { flex: none; aspect-ratio: 2 / 1.1; contain: none; }
+  .hemicycle-wrap { flex: none; aspect-ratio: 2 / 1.1; contain: none; max-height: 210px; }
   .mode-btn { flex: 1; justify-content: center; }
   /* Panneau stats : feuille montante fixe depuis le bas */
   .controls-panel {
