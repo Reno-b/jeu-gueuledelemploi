@@ -520,7 +520,8 @@ function openCardModal(d, cardEl) {
 
   backdrop.classList.add('active');
   modal.classList.remove('closing');
-  modal.classList.add('active');
+  /* Double RAF : force Safari à peindre l'élément avant de démarrer l'animation */
+  requestAnimationFrame(() => requestAnimationFrame(() => modal.classList.add('active')));
 }
 
 function closeCardModal() {

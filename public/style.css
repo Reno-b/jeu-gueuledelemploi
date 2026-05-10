@@ -389,7 +389,7 @@ body::before {
 
 
 .reveal-banner {
-  position: absolute; left: 12px; right: 12px; top: 12px;
+  position: absolute; left: 12px; right: 12px; bottom: 12px;
   border: var(--border-thick); box-shadow: var(--shadow-sm);
   background: var(--paper);
   padding: 8px 10px;
@@ -415,12 +415,8 @@ body::before {
 }
 
 .deputy-meta {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  z-index: 10;
-  background: var(--paper);
-  border-top: var(--border-thick);
-  padding: 8px 10px;
   display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  flex-shrink: 0;
   animation: reveal 0.45s 0.1s both ease-out;
 }
 .meta-chip {
@@ -592,10 +588,20 @@ body::before {
   .trigger-hint { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; white-space: nowrap; }
   /* Stats en grille 2×2 dans la feuille */
   .stats { display: grid; grid-template-columns: 1fr 1fr; }
-  /* Meta chips en overlay : padding et gap réduits sur mobile */
-  .deputy-meta { padding: 6px 8px; gap: 6px; animation: reveal 0.35s 0.1s both ease-out; }
+  /* Meta chips en overlay en bas de la photo */
+  .deputy-meta {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    z-index: 10; background: var(--paper);
+    padding: 6px 8px; gap: 6px;
+    border-top: var(--border-thick);
+    animation: reveal 0.35s 0.1s both ease-out;
+  }
   .meta-chip { background: var(--paper-2); border-color: var(--ink); color: var(--ink); padding: 4px 6px; font-size: 10px; }
   .meta-chip strong { color: var(--ink); font-size: 11px; margin-top: 2px; }
+}
+@media (max-width: 860px) {
+  /* Reveal-banner en haut pour éviter le chevauchement avec l'encart meta en bas */
+  .reveal-banner { bottom: unset; top: 12px; }
 }
 @media (max-width: 480px) {
   .app { padding: 10px 12px; }
