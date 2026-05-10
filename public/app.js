@@ -3,7 +3,7 @@
 const MACROS = [
   { id: 'gauche', label: 'Gauche', color: '#e63946', subs: ['GDR', 'LFI-NFP', 'EcoS', 'SOC'] },
   { id: 'droite', label: 'Droite', color: '#2a4dff', subs: ['EPR', 'Dem', 'HOR', 'LIOT'] },
-  { id: 'facho',  label: 'Facho',  color: '#0a0a0a', subs: ['DR', 'UDR', 'RN'] },
+  { id: 'facho',  label: 'Facho',  color: '#1a1a1a', subs: ['DR', 'UDR', 'RN'] },
 ];
 
 const GROUP_NICKS = {
@@ -15,11 +15,26 @@ const GROUP_NICKS = {
 const GROUP_COLORS = {
   'GDR': '#d12a2a', 'LFI-NFP': '#8b3fcf', 'EcoS': '#2da567', 'SOC': '#ff5d8f',
   'EPR': '#ffd23f', 'Dem': '#ff9a3c', 'HOR': '#5cc8f0', 'LIOT': '#4b3cd1',
-  'DR': '#1f3a6b', 'UDR': '#6b3f1f', 'RN': '#0a0a0a',
+  'DR': '#1f3a6b', 'UDR': '#6b3f1f', 'RN': '#1a1a1a',
 };
 
 // Groupes à fond clair → texte sombre
 const LIGHT_FILLS = new Set(['EPR', 'HOR', 'EcoS', 'SOC', 'Dem']);
+
+const ADJACENCY = {
+  'GDR':     ['LFI-NFP'],
+  'LFI-NFP': ['GDR', 'EcoS'],
+  'EcoS':    ['LFI-NFP', 'SOC'],
+  'SOC':     ['EcoS', 'EPR'],
+  'EPR':     ['SOC', 'Dem'],
+  'Dem':     ['EPR', 'HOR'],
+  'HOR':     ['Dem', 'DR'],
+  'LIOT':    [],
+  'DR':      ['HOR', 'UDR'],
+  'UDR':     ['DR', 'RN'],
+  'RN':      ['UDR', 'NI'],
+  'NI':      ['RN'],
+};
 
 /* ── SVG helpers ──────────────────────────────────────────────────────────── */
 const CX = 200, CY = 180, R_OUT = 175, R_IN = 60;
@@ -74,9 +89,31 @@ let revealed = false;
 let answerState = 'idle';
 let seen = new Set();
 let autoTimer = null;
-const score = { good: 0, bad: 0, streak: 0, record: 0 };
+const score = { good: 0, bad: 0, streak: 0, record: 0, points: 0, pointsRecord: 0 };
 
-function recordKey(m) { return `record_${m}`; }
+function recordKey(m)       { return `record_${m}`; }
+function pointsRecordKey(m) { return `points_record_${m}`; }
+
+function calcPoints(ok, picked, correct) {
+  if (mode === 'easy') return ok ? 1 : -1;
+  if (picked === correct) return correct === 'LIOT' ? 5 : 3;
+  if ((ADJACENCY[correct] || []).includes(picked)) return 2;
+  const correctMacro = MACROS.find(m => m.subs.includes(correct));
+  const pickedMacro  = MACROS.find(m => m.subs.includes(picked));
+  return correctMacro === pickedMacro ? 1 : -1;
+}
+
+function bumpScore(pts) {
+  const card = document.querySelector('.stat-card[data-tone="score-pts"]');
+  if (!card) return;
+  const el = document.createElement('span');
+  el.className = 'score-bump';
+  el.textContent = pts > 0 ? `+${pts}` : `${pts}`;
+  el.style.color = pts > 0 ? 'var(--green)' : 'var(--pink)';
+  el.style.setProperty('--bump-rot', pts > 0 ? '-6deg' : '6deg');
+  card.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
 
 // Détection touch (hover: none = pas de hover natif)
 const isTouch = typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches;
@@ -108,9 +145,11 @@ async function init() {
     groups   = data.groups;
     if (!deputies.length) throw new Error('Aucun député trouvé');
 
-    // Charger le record depuis localStorage (par mode)
-    score.record = parseInt(localStorage.getItem(recordKey(mode)) || '0', 10);
-    $('score-record').textContent = score.record;
+    // Charger les records depuis localStorage (par mode)
+    score.record       = parseInt(localStorage.getItem(recordKey(mode)) || '0', 10);
+    score.pointsRecord = parseInt(localStorage.getItem(pointsRecordKey(mode)) || '0', 10);
+    $('score-record').textContent        = score.record;
+    $('score-points-record').textContent = score.pointsRecord;
 
     // Hint adaptatif au device
     $('hover-hint').textContent = isTouch
@@ -296,6 +335,11 @@ function drawHemicycle() {
 
           const sg = svgEl('g');
           sg.classList.add('sub-group');
+          if (!revealed) sg.classList.add('pop-sector');
+          if (revealed && animProgress >= 1) {
+            if (abbr === current.groupe) sg.classList.add('sector-reveal-correct');
+            else if (abbr === picked)    sg.classList.add('sector-reveal-wrong');
+          }
           sg.style.opacity = subOpacity;
 
           const subD = arcPath(a0 + 0.5, a1 - 0.5, R_IN + 3, R_OUT - 3);
@@ -344,10 +388,17 @@ function drawHemicycle() {
     }
 
     // Événements sur le groupe
+    if (revealed && mode === 'easy') {
+      const correctMacro = MACROS.find(mx => mx.subs.includes(current.groupe));
+      if (correctMacro && m.id === correctMacro.id) g.classList.add('sector-reveal-correct');
+      else if (m.id === picked)                      g.classList.add('sector-reveal-wrong');
+    }
+
     if (!revealed) {
       if (mode === 'easy') {
         // Mode facile : clic direct sur la macro = réponse, pas d'expansion
         g.style.cursor = 'pointer';
+        g.classList.add('pop-sector');
         g.addEventListener('click', () => handlePick(m.id));
       } else if (isTouch) {
         // Touch normal : tap pour toggler l'expansion
@@ -517,21 +568,27 @@ function handlePick(abbr) {
   if (ok) triggerCorrectEffect();
   else    triggerWrongEffect();
 
-  updateScore(ok);
+  const pts = calcPoints(ok, abbr, current.groupe);
+  updateScore(ok, pts);
 
   // Expanser la macro contenant la bonne réponse (mode normal uniquement, pour montrer le bon groupe)
   if (mode !== 'easy') {
     const correctMacro = MACROS.find(m => m.subs.includes(current.groupe));
-    if (correctMacro) setActiveMacro(correctMacro.id);
-    else drawHemicycle();
+    if (correctMacro) {
+      // Si la macro correcte est déjà active, setActiveMacro retournerait sans redessiner
+      if (activeMacro === correctMacro.id) drawHemicycle();
+      else setActiveMacro(correctMacro.id);
+    } else {
+      drawHemicycle();
+    }
   } else {
     drawHemicycle();
   }
 
-  revealCard();
-
-  // Auto-avance après 1s dans tous les modes
-  autoTimer = setTimeout(nextDeputy, 1000);
+  // Laisser l'hémicycle animer avant de révéler la carte
+  const revealDelay = ANIM_DUR + 80;
+  setTimeout(revealCard, revealDelay);
+  autoTimer = setTimeout(nextDeputy, revealDelay + 1100);
 }
 
 function revealCard() {
@@ -566,8 +623,8 @@ function revealCard() {
 
 /* ── Score ────────────────────────────────────────────────────────────────── */
 function bumpStat(tone) {
-  const colors = { good: 'var(--green)', bad: 'var(--pink)', streak: 'var(--orange)', record: 'var(--violet)' };
-  const rots   = { good: '-8deg', bad: '6deg', streak: '-4deg', record: '9deg' };
+  const colors = { good: 'var(--green)', bad: 'var(--pink)', streak: 'var(--orange)', record: 'var(--violet)', 'score-rec': 'var(--yellow)' };
+  const rots   = { good: '-8deg', bad: '6deg', streak: '-4deg', record: '9deg', 'score-rec': '-5deg' };
   const card = document.querySelector(`.stat-card[data-tone="${tone}"]`);
   if (!card) return;
   const el = document.createElement('span');
@@ -579,8 +636,9 @@ function bumpStat(tone) {
   el.addEventListener('animationend', () => el.remove());
 }
 
-function updateScore(ok) {
+function updateScore(ok, pts) {
   const wasRecord = score.record;
+  const wasPointsRecord = score.pointsRecord;
   if (ok) {
     score.good++;
     score.streak++;
@@ -593,20 +651,29 @@ function updateScore(ok) {
     score.streak = 0;
   }
 
-  $('score-good').textContent   = score.good;
-  $('score-bad').textContent    = score.bad;
-  $('score-streak').textContent = score.streak;
-  $('score-record').textContent = score.record;
+  score.points = Math.max(0, score.points + pts);
+  if (score.points > score.pointsRecord) {
+    score.pointsRecord = score.points;
+    localStorage.setItem(pointsRecordKey(mode), score.pointsRecord);
+  }
 
+  $('score-good').textContent         = score.good;
+  $('score-bad').textContent          = score.bad;
+  $('score-streak').textContent       = score.streak;
+  $('score-record').textContent       = score.record;
+  $('score-points').textContent       = score.points;
+  $('score-points-record').textContent = score.pointsRecord;
+
+  bumpScore(pts);
   if (ok) {
     bumpStat('good');
     bumpStat('streak');
     if (score.record > wasRecord) bumpStat('record');
+    if (score.pointsRecord > wasPointsRecord) bumpStat('score-rec');
   } else {
     bumpStat('bad');
   }
 
-  // Animation stat card série
   if (ok && score.streak > 1) {
     const c = document.querySelector('.stat-card[data-tone="streak"]');
     c.style.transform = 'translate(-4px, -4px)';
@@ -618,17 +685,21 @@ function updateScore(ok) {
 function setMode(m) {
   if (mode === m) return;
   mode = m;
-  score.good   = 0;
-  score.bad    = 0;
-  score.streak = 0;
-  score.record = parseInt(localStorage.getItem(recordKey(m)) || '0', 10);
-  $('score-good').textContent   = 0;
-  $('score-bad').textContent    = 0;
-  $('score-streak').textContent = 0;
-  $('score-record').textContent = score.record;
+  score.good         = 0;
+  score.bad          = 0;
+  score.streak       = 0;
+  score.record       = parseInt(localStorage.getItem(recordKey(m)) || '0', 10);
+  score.points       = 0;
+  score.pointsRecord = parseInt(localStorage.getItem(pointsRecordKey(m)) || '0', 10);
+  $('score-good').textContent          = 0;
+  $('score-bad').textContent           = 0;
+  $('score-streak').textContent        = 0;
+  $('score-record').textContent        = score.record;
+  $('score-points').textContent        = 0;
+  $('score-points-record').textContent = score.pointsRecord;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   $(`btn-${m}`).classList.add('active');
-  nextDeputy();
+  drawHemicycle();
 }
 
 /* ── Démarrage ────────────────────────────────────────────────────────────── */
