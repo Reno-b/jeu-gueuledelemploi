@@ -651,16 +651,17 @@ function revealCard() {
 
 /* ── Score ────────────────────────────────────────────────────────────────── */
 function bumpStat(tone) {
+  if (getMobileAnchor()) return; // sur mobile, seul bumpScore apparaît sur le trigger
   const colors = { good: 'var(--green)', bad: 'var(--pink)', streak: 'var(--orange)', record: 'var(--violet)', 'score-rec': 'var(--yellow)' };
   const rots   = { good: '-8deg', bad: '6deg', streak: '-4deg', record: '9deg', 'score-rec': '-5deg' };
+  const card = document.querySelector(`.stat-card[data-tone="${tone}"]`);
+  if (!card) return;
   const el = document.createElement('span');
   el.className = 'score-bump';
   el.textContent = '+1';
   el.style.color = colors[tone] || 'var(--ink)';
   el.style.setProperty('--bump-rot', rots[tone] || '-6deg');
-  const anchor = getMobileAnchor() || document.querySelector(`.stat-card[data-tone="${tone}"]`);
-  if (!anchor) return;
-  anchor.appendChild(el);
+  card.appendChild(el);
   el.addEventListener('animationend', () => el.remove());
 }
 
