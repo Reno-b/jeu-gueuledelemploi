@@ -159,7 +159,7 @@ body::before {
   flex-shrink: 0;
   display: grid; place-items: center;
   background: var(--ink-bg); color: var(--paper);
-  border-radius: 50%; font-size: 13px; font-weight: 800;
+  border-radius: 50%; font-size: 13px; font-weight: 800; line-height: 1;
 }
 .stat-card .num {
   font-family: 'Archivo Black', sans-serif;
@@ -561,13 +561,13 @@ body::before {
   /* Meta chips en overlay en bas de la photo */
   .deputy-meta {
     position: absolute; bottom: 0; left: 0; right: 0;
-    z-index: 10; background: rgba(10,10,10,0.85);
-    padding: 5px 8px; gap: 4px;
-    border-top: 2px solid rgba(255,255,255,0.15);
+    z-index: 10; background: var(--paper);
+    padding: 6px 8px; gap: 6px;
+    border-top: var(--border-thick);
     animation: reveal 0.35s 0.1s both ease-out;
   }
-  .meta-chip { background: transparent; border-color: rgba(255,255,255,0.18); color: var(--paper); padding: 2px 5px; font-size: 9px; }
-  .meta-chip strong { color: var(--paper); font-size: 10px; margin-top: 1px; }
+  .meta-chip { background: var(--paper-2); border-color: var(--ink); color: var(--ink); padding: 4px 6px; font-size: 10px; }
+  .meta-chip strong { color: var(--ink); font-size: 11px; margin-top: 2px; }
 }
 @media (max-width: 480px) {
   .app { padding: 10px 12px; }
