@@ -650,7 +650,7 @@ function revealCard() {
 }
 
 /* ── Score ────────────────────────────────────────────────────────────────── */
-function bumpStat(tone) {
+function bumpStat(tone, text = '+1') {
   if (getMobileAnchor()) return; // sur mobile, seul bumpScore apparaît sur le trigger
   const colors = { good: 'var(--green)', bad: 'var(--pink)', streak: 'var(--orange)', record: 'var(--violet)', 'score-rec': 'var(--yellow)' };
   const rots   = { good: '-8deg', bad: '6deg', streak: '-4deg', record: '9deg', 'score-rec': '-5deg' };
@@ -658,7 +658,7 @@ function bumpStat(tone) {
   if (!card) return;
   const el = document.createElement('span');
   el.className = 'score-bump';
-  el.textContent = '+1';
+  el.textContent = text;
   el.style.color = colors[tone] || 'var(--ink)';
   el.style.setProperty('--bump-rot', rots[tone] || '-6deg');
   card.appendChild(el);
@@ -699,7 +699,7 @@ function updateScore(ok, pts) {
     bumpStat('good');
     bumpStat('streak');
     if (score.record > wasRecord) bumpStat('record');
-    if (score.pointsRecord > wasPointsRecord) bumpStat('score-rec');
+    if (score.pointsRecord > wasPointsRecord) bumpStat('score-rec', `+${score.pointsRecord - wasPointsRecord}`);
   } else {
     bumpStat('bad');
   }

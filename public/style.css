@@ -157,9 +157,9 @@ body::before {
 .stat-card .icon {
   width: 26px; height: 26px;
   flex-shrink: 0;
-  display: grid; place-items: center;
+  display: flex; align-items: center; justify-content: center;
   background: var(--ink-bg); color: var(--paper);
-  border-radius: 50%; font-size: 13px; font-weight: 800; line-height: 1;
+  border-radius: 50%; font-size: 13px; font-weight: 800; line-height: 1; letter-spacing: 0;
 }
 .stat-card .num {
   font-family: 'Archivo Black', sans-serif;
@@ -568,6 +568,10 @@ body::before {
   }
   .meta-chip { background: var(--paper-2); border-color: var(--ink); color: var(--ink); padding: 4px 6px; font-size: 10px; }
   .meta-chip strong { color: var(--ink); font-size: 11px; margin-top: 2px; }
+}
+@media (max-width: 860px) {
+  /* Reveal-banner en haut pour éviter le chevauchement avec l'encart meta en bas */
+  .reveal-banner { bottom: unset; top: 12px; }
 }
 @media (max-width: 480px) {
   .app { padding: 10px 12px; }
