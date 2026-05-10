@@ -508,16 +508,14 @@ body::before {
   .site-title { font-size: clamp(20px, 7vw, 32px); white-space: nowrap; width: 100%; display: flex; align-items: center; }
   .site-title .accent { flex: 1; text-align: center; margin-left: 6px; transform: rotate(-1deg); }
   .mode-btn .badge { display: none; }
-  /* Colonne unique, pas de scroll */
-  .main { grid-template-columns: 1fr; grid-template-rows: auto; overflow-x: hidden; overflow-y: hidden; height: auto; }
-  /* Carte : hauteur adaptée (panneau stats hors du flux normal) */
-  .card-stack { height: clamp(150px, calc(100dvh - 420px), 45vh); }
+  /* Colonne unique : grid-rows garantit la visibilité du trigger en bas */
+  .main { grid-template-columns: 1fr; grid-template-rows: clamp(150px, calc(100dvh - 420px), 45vh) 1fr; overflow: hidden; gap: 12px; }
   .shadow-photo-wrap { flex: 1; min-height: 0; width: auto; aspect-ratio: 3/4; align-self: center; max-width: 100%; margin: 0; }
   .deputy-card { height: 100%; overflow: hidden; }
   .photo-wrap { flex: 1; min-height: 0; width: auto; aspect-ratio: 3/4; align-self: center; max-width: 100%; margin: 0; }
-  .right-col { height: auto; overflow: visible; }
-  .panel { height: auto; flex: none; }
-  .hemicycle-wrap { flex: none; aspect-ratio: 2 / 1.1; contain: none; max-height: 210px; }
+  .right-col { overflow: hidden; }
+  .panel { flex: 1; min-height: 0; }
+  .hemicycle-wrap { flex: 1; min-height: 0; contain: none; }
   .mode-btn { flex: 1; justify-content: center; }
   /* Panneau stats : feuille montante fixe depuis le bas */
   .controls-panel {
@@ -549,6 +547,7 @@ body::before {
     background: #4b3cd1; color: var(--paper);
     border: var(--border-thick); box-shadow: var(--shadow-sm);
     padding: 9px 14px; cursor: pointer; flex-shrink: 0; width: 100%;
+    position: relative;
     transition: transform 0.1s, box-shadow 0.1s;
   }
   .stats-trigger:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 0 var(--ink); }

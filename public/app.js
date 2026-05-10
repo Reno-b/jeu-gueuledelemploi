@@ -103,15 +103,20 @@ function calcPoints(ok, picked, correct) {
   return correctMacro === pickedMacro ? 1 : -1;
 }
 
+function getMobileAnchor() {
+  const t = document.getElementById('stats-trigger');
+  return t && getComputedStyle(t).display !== 'none' ? t : null;
+}
+
 function bumpScore(pts) {
-  const card = document.querySelector('.stat-card[data-tone="score-pts"]');
-  if (!card) return;
   const el = document.createElement('span');
   el.className = 'score-bump';
   el.textContent = pts > 0 ? `+${pts}` : `${pts}`;
   el.style.color = pts > 0 ? 'var(--green)' : 'var(--pink)';
   el.style.setProperty('--bump-rot', pts > 0 ? '-6deg' : '6deg');
-  card.appendChild(el);
+  const anchor = getMobileAnchor() || document.querySelector('.stat-card[data-tone="score-pts"]');
+  if (!anchor) return;
+  anchor.appendChild(el);
   el.addEventListener('animationend', () => el.remove());
 }
 
@@ -648,14 +653,14 @@ function revealCard() {
 function bumpStat(tone) {
   const colors = { good: 'var(--green)', bad: 'var(--pink)', streak: 'var(--orange)', record: 'var(--violet)', 'score-rec': 'var(--yellow)' };
   const rots   = { good: '-8deg', bad: '6deg', streak: '-4deg', record: '9deg', 'score-rec': '-5deg' };
-  const card = document.querySelector(`.stat-card[data-tone="${tone}"]`);
-  if (!card) return;
   const el = document.createElement('span');
   el.className = 'score-bump';
   el.textContent = '+1';
   el.style.color = colors[tone] || 'var(--ink)';
   el.style.setProperty('--bump-rot', rots[tone] || '-6deg');
-  card.appendChild(el);
+  const anchor = getMobileAnchor() || document.querySelector(`.stat-card[data-tone="${tone}"]`);
+  if (!anchor) return;
+  anchor.appendChild(el);
   el.addEventListener('animationend', () => el.remove());
 }
 
