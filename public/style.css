@@ -515,7 +515,7 @@ body::before {
   .photo-wrap { flex: 1; min-height: 0; width: auto; aspect-ratio: 3/4; align-self: center; max-width: 100%; margin: 0; }
   .right-col { overflow: hidden; }
   .panel { flex: 1; min-height: 0; }
-  .hemicycle-wrap { flex: 1; min-height: 0; contain: none; }
+  .hemicycle-wrap { flex: 1; min-height: 0; contain: none; aspect-ratio: unset; width: 100%; }
   .mode-btn { flex: 1; justify-content: center; }
   /* Panneau stats : feuille montante fixe depuis le bas */
   .controls-panel {
