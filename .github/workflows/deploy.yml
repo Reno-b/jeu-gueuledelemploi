@@ -3,9 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  schedule:
-    - cron: '0 6 * * 1'   # Tous les lundis à 6h — données fraîches
-  workflow_dispatch:        # Déclenchement manuel possible
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -26,17 +24,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Generate deputies.json
-        run: node scripts/build-data.js
 
       - name: Configure Pages
         uses: actions/configure-pages@v4

@@ -3,154 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Devine le Parti</title>
+  <title>Devine le Parti — déménagement</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0a0a0a;
+      --paper: #fdf6e3;
+      --blue: #2a4dff;
+      --red: #ff3b3b;
+      --font-display: 'Archivo Black', system-ui, sans-serif;
+      --font-body: 'Space Grotesk', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100%;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      position: fixed; inset: 0;
+      pointer-events: none;
+      background-image: radial-gradient(circle, rgba(10,10,10,0.06) 1px, transparent 1px);
+      background-size: 22px 22px;
+      z-index: 0;
+    }
+    .wrap {
+      position: relative; z-index: 1;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 620px;
+      background: #ffffff;
+      border: 4px solid var(--ink);
+      box-shadow: 10px 10px 0 0 var(--ink);
+      padding: 40px 36px;
+      text-align: center;
+    }
+    .flag-fr {
+      display: inline-flex;
+      width: 64px;
+      height: 42px;
+      border: 3px solid var(--ink);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .flag-fr span { flex: 1; height: 100%; display: block; }
+    .flag-fr span:nth-child(1) { background: var(--blue); }
+    .flag-fr span:nth-child(2) { background: #ffffff; }
+    .flag-fr span:nth-child(3) { background: var(--red); }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 18px;
+    }
+    .lede {
+      font-size: 17px;
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+    .domain {
+      font-family: var(--font-display);
+      font-size: clamp(22px, 4vw, 32px);
+      letter-spacing: -0.01em;
+      margin: 22px 0 30px;
+      padding: 14px 18px;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      display: inline-block;
+      word-break: break-all;
+    }
+    .cta {
+      font-family: var(--font-display);
+      font-size: 18px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: #ffffff;
+      background: var(--ink);
+      border: 4px solid var(--ink);
+      box-shadow: 6px 6px 0 0 var(--blue);
+      padding: 16px 28px;
+      display: inline-block;
+      transition: transform 140ms cubic-bezier(.2,.8,.2,1),
+                  box-shadow 140ms cubic-bezier(.2,.8,.2,1);
+    }
+    .cta:hover, .cta:focus-visible {
+      transform: translate(-3px, -3px);
+      box-shadow: 9px 9px 0 0 var(--blue);
+      outline: none;
+    }
+    .footer {
+      margin-top: 28px;
+      font-size: 13px;
+      opacity: 0.6;
+    }
+  </style>
 </head>
-<body data-bg="dots">
-<div class="app">
-
-  <!-- HEADER -->
-  <header class="header">
-    <h1 class="site-title"><span class="flag-fr" aria-hidden="true"><span></span><span></span><span></span></span><span class="accent">Devine le Parti</span></h1>
-    <a href="stats.html" class="btn-collection" aria-label="Ma collection de députés">Ma Collection</a>
-  </header>
-
-  <!-- LOADING -->
-  <div id="loading">
-    <div class="spinner"></div>
-    <p>Chargement des 577 députés…</p>
-  </div>
-
-  <!-- ERROR -->
-  <div id="error" class="hidden">
-    <div class="error-box">
-      <p class="error-icon">⚠️</p>
-      <p id="error-msg">Erreur de chargement</p>
-      <button class="btn-retry" onclick="init()">Réessayer</button>
+<body>
+  <main class="wrap">
+    <div class="card">
+      <span class="flag-fr" aria-hidden="true"><span></span><span></span><span></span></span>
+      <h1>Le jeu a déménagé&nbsp;!</h1>
+      <p class="lede">« Devine le Parti » est désormais accessible à sa nouvelle adresse&nbsp;:</p>
+      <div class="domain">devineleparti.dev</div>
+      <p>
+        <a class="cta" href="https://devineleparti.dev">Aller sur le nouveau site →</a>
+      </p>
+      <p class="footer">Pensez à mettre à jour vos favoris.</p>
     </div>
-  </div>
-
-  <!-- MAIN GAME -->
-  <div class="main hidden" id="game">
-
-    <!-- Colonne gauche : Deputy card (dans un stack pour l'animation swipe) -->
-    <div class="card-stack">
-      <div class="deputy-card-shadow" id="deputy-card-shadow">
-        <div class="shadow-photo-wrap">
-          <img id="shadow-photo" class="shadow-photo" alt="" draggable="false">
-          <div class="corner tl"></div><div class="corner tr"></div>
-          <div class="corner bl"></div><div class="corner br"></div>
-        </div>
-      </div>
-      <div class="deputy-card" id="deputy-card">
-        <div class="photo-wrap">
-          <img id="deputy-photo" class="deputy-photo" alt="Portrait" draggable="false">
-          <div class="scan-lines"></div>
-          <div class="corner tl"></div><div class="corner tr"></div>
-          <div class="corner bl"></div><div class="corner br"></div>
-          <!-- Effect overlay inside photo-wrap: stamp centered on photo, stars can overflow -->
-          <div class="effect-layer" id="effect-layer">
-            <div class="effect-stamp" id="effect-stamp"></div>
-          </div>
-        </div>
-        <!-- Révélation : superposé sur tout le cadre, largeur = cadre -->
-        <div class="reveal-stack">
-          <div class="reveal-banner hidden" id="reveal-banner">
-            <div class="reveal-name" id="reveal-name"></div>
-            <div class="reveal-group" id="reveal-group"></div>
-          </div>
-          <div class="deputy-meta hidden" id="deputy-meta">
-            <div class="meta-chip">Circonscription<strong id="meta-circo">—</strong></div>
-            <div class="meta-chip">Département<strong id="meta-dept">—</strong></div>
-            <div class="meta-chip">Profession<strong id="meta-prof">—</strong></div>
-            <div class="meta-chip">Région<strong id="meta-region">—</strong></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Colonne droite : Hémicycle -->
-    <div class="right-col">
-      <div class="panel">
-        <h3 class="panel-title" id="panel-title">
-          <span class="num-tag" id="panel-tag">?</span>
-          <span id="panel-text">Quel est le groupe parlementaire ?</span>
-        </h3>
-
-        <div class="hemicycle-wrap" id="hemicycle-container">
-          <svg viewBox="0 0 400 200" id="hemicycle-svg" role="img" aria-label="Hémicycle interactif"></svg>
-            <div class="hover-hint" id="hover-hint">Survole une famille pour voir les groupes</div>
-        </div>
-
-      </div>
-
-      <!-- Panneau bas : stats + modes -->
-      <div class="controls-panel">
-        <button class="stats-close-btn" id="stats-close-btn" aria-label="Fermer">✕</button>
-        <h3 class="section-title">Score :</h3>
-        <div class="stats">
-          <div class="stat-card" data-tone="score-pts">
-            <div class="stat-top"><span>Points</span><span class="icon">▲</span></div>
-            <div class="num" id="score-points">0</div>
-          </div>
-          <div class="stat-card" data-tone="score-rec">
-            <div class="stat-top"><span>Record</span><span class="icon">◆</span></div>
-            <div class="num" id="score-points-record">0</div>
-          </div>
-        </div>
-        <h3 class="section-title">Stats :</h3>
-        <div class="stats">
-          <div class="stat-card" data-tone="good">
-            <div class="stat-top"><span>Bonnes réponses</span><span class="icon">✓</span></div>
-            <div class="num" id="score-good">0</div>
-          </div>
-          <div class="stat-card" data-tone="bad">
-            <div class="stat-top"><span>Mauvaises réponses</span><span class="icon">✗</span></div>
-            <div class="num" id="score-bad">0</div>
-          </div>
-          <div class="stat-card" data-tone="streak">
-            <div class="stat-top"><span>Série actuelle</span><span class="icon">★</span></div>
-            <div class="num" id="score-streak">0</div>
-          </div>
-          <div class="stat-card" data-tone="record">
-            <div class="stat-top"><span>Meilleure série</span><span class="icon">♦</span></div>
-            <div class="num" id="score-record">0</div>
-          </div>
-        </div>
-        <h3 class="section-title">Mode de jeu :</h3>
-        <div class="modes">
-          <button class="mode-btn active" id="btn-normal">🏛 Normal <span class="badge">12 GROUPES</span></button>
-          <button class="mode-btn" id="btn-easy">🎯 Facile <span class="badge">3 CHOIX</span></button>
-        </div>
-      </div>
-
-      <!-- Mobile uniquement : barre Points qui ouvre le panneau stats -->
-      <button class="stats-trigger" id="stats-trigger">
-        <span class="trigger-pts">
-          <span class="trigger-icon">▲</span>
-          <span class="trigger-label">Points</span>
-          <strong class="trigger-num" id="trigger-points">0</strong>
-        </span>
-        <span class="trigger-hint">Voir les stats ↑</span>
-      </button>
-      <!-- Mobile uniquement : lien collection sous la barre points -->
-      <a href="stats.html" class="btn-collection btn-collection-mobile-only" aria-label="Ma collection de députés">Ma Collection</a>
-    </div>
-
-  </div><!-- /main -->
-
-  <div class="stats-backdrop" id="stats-backdrop"></div>
-
-
-</div><!-- /app -->
-
-<footer class="footer">
-  <p>Données : <a href="https://data.assemblee-nationale.fr" target="_blank" rel="noopener">data.assemblee-nationale.fr</a></p>
-</footer>
-
-<script src="app.js"></script>
+  </main>
 </body>
 </html>
