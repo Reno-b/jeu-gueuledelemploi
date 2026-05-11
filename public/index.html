@@ -49,18 +49,12 @@
       padding: 40px 36px;
       text-align: center;
     }
-    .flag-fr {
-      display: inline-flex;
-      width: 64px;
-      height: 42px;
-      border: 3px solid var(--ink);
-      margin-bottom: 24px;
-      overflow: hidden;
+    .emblem {
+      display: inline-block;
+      font-size: 56px;
+      line-height: 1;
+      margin-bottom: 20px;
     }
-    .flag-fr span { flex: 1; height: 100%; display: block; }
-    .flag-fr span:nth-child(1) { background: var(--blue); }
-    .flag-fr span:nth-child(2) { background: #ffffff; }
-    .flag-fr span:nth-child(3) { background: var(--red); }
 
     h1 {
       font-family: var(--font-display);
@@ -115,7 +109,7 @@
 <body>
   <main class="wrap">
     <div class="card">
-      <span class="flag-fr" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="emblem" role="img" aria-label="Assemblée">🏛️</span>
       <h1>Le jeu a déménagé&nbsp;!</h1>
       <p class="lede">« Devine le Parti » est désormais accessible à sa nouvelle adresse&nbsp;:</p>
       <div class="domain">devineleparti.dev</div>
